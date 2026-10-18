@@ -364,6 +364,38 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .askface{position:relative;width:92px;aspect-ratio:400/670}
 .askface img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 100%;animation:breathe 4.2s ease-in-out infinite}
 #btnStart.confirm{background:var(--mult);color:#fff}
+#ovZoro{background:radial-gradient(circle at 50% 42%, #3a1f5c 0%, #0b0810 70%);overflow:hidden;z-index:80}
+#ovZoro .zburst{position:absolute;left:50%;top:40%;width:220vmax;height:220vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(rgba(255,255,255,.07) 0 6deg, transparent 6deg 18deg);animation:zspin 14s linear infinite;pointer-events:none;opacity:.0;transition:opacity .4s}
+#ovZoro.lit .zburst{opacity:1}
+#ovZoro.j7{background:radial-gradient(circle at 50% 42%, #ffcf3a 0%, #b5530b 38%, #1a0b02 78%)}
+#ovZoro.j7 .zburst{background:repeating-conic-gradient(rgba(255,240,160,.22) 0 6deg, transparent 6deg 16deg);animation-duration:6s}
+@keyframes zspin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+#ovZoro .zoro{position:relative;display:grid;place-items:center;gap:16px;width:min(92vw,420px)}
+#ovZoro .zlabel{font-weight:900;font-size:22px;letter-spacing:.35em;color:var(--gold);text-shadow:3px 3px 0 #000}
+#ovZoro .zreels{display:flex;gap:10px}
+#ovZoro .zreels span{width:84px;height:110px;display:grid;place-items:center;font-size:76px;font-weight:900;color:#fff;background:linear-gradient(#1a1424,#2d2140 50%,#1a1424);border:4px solid #000;border-radius:12px;box-shadow:5px 5px 0 #000, inset 0 0 0 3px rgba(255,255,255,.12);font-variant-numeric:tabular-nums}
+#ovZoro .zreels span.spin{filter:blur(1.5px);color:#cdbfee}
+#ovZoro .zreels span.stop{animation:zstop .28s cubic-bezier(.2,1.8,.4,1)}
+#ovZoro .zreels span.win{color:#111;background:linear-gradient(#fff6b0,#ffd400 55%,#f08a00);box-shadow:5px 5px 0 #000,0 0 28px #ffd400}
+#ovZoro.j7 .zreels span.win{background:linear-gradient(#fff,#ffe36a 40%,#ff9d00);box-shadow:5px 5px 0 #000,0 0 46px #fff2a0;animation:zglow .6s ease-in-out infinite alternate}
+@keyframes zstop{0%{transform:translateY(-18px) scale(1.15)}100%{transform:none}}
+@keyframes zglow{to{box-shadow:5px 5px 0 #000,0 0 70px #fff}}
+#ovZoro .zstamp{min-height:54px;font-weight:900;font-size:40px;color:#fff;text-shadow:4px 4px 0 var(--mult),-2px -2px 0 #000;transform:rotate(-6deg) scale(0);opacity:0}
+#ovZoro .zstamp.go{animation:zstamp .4s cubic-bezier(.2,1.8,.4,1) forwards}
+#ovZoro.j7 .zstamp{font-size:46px;text-shadow:4px 4px 0 #c0102a,-2px -2px 0 #000,0 0 30px #fff}
+@keyframes zstamp{0%{opacity:0;transform:rotate(-6deg) scale(3)}100%{opacity:1;transform:rotate(-6deg) scale(1)}}
+#ovZoro .zcard{width:100%;display:grid;gap:12px;background:var(--bg2);border:3px solid #000;border-radius:16px;padding:14px;box-shadow:6px 6px 0 #000;animation:zcard .3s ease-out}
+@keyframes zcard{from{opacity:0;transform:translateY(20px)}}
+#ovZoro .zrelic{display:flex;gap:12px;align-items:center;font-weight:800}
+#ovZoro .zrelic b{width:52px;height:52px;flex:none;display:grid;place-items:center;border-radius:10px;background:linear-gradient(#fff6b0,#ffd400);color:#111;font-size:26px;border:3px solid #000}
+#ovZoro .zrelic small{display:block;font-weight:600;color:var(--muted);font-size:12px}
+#ovZoro .zpick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#ovZoro .zpick button{font:inherit;font-size:13px;font-weight:700;padding:8px;border-radius:8px;border:2px solid #000;background:var(--surface);color:var(--text)}
+#ovZoro .zpick button.sel{background:var(--mult);color:#fff}
+#ovZoro .zpick p{grid-column:1/-1;margin:0;font-size:13px;color:var(--muted)}
+html.hr{--bg:#0d0b07;--bg2:#1a150c;--surface:#262011;--surface2:#352c17;--muted:#e2cf9c;--gold:#ffd23f;--lime:#ffd23f;--ok:#ffd23f}
+html.hr body{background:radial-gradient(circle at 50% -10%, #3b2d0c 0%, #0d0b07 60%) fixed, #0d0b07}
+html.hr .sheet{box-shadow:0 0 0 2px #ffd23f inset, 6px 6px 0 #000}
 .htable td{padding:8px 4px;border-bottom:1px solid var(--line)}
 .htable td.n{font-weight:800;text-align:right;white-space:nowrap}
 .htable .c{color:var(--chip)} .htable .m{color:var(--mult)}
@@ -735,6 +767,10 @@ b.km{color:var(--mult);font-weight:900}
 #coach .cp{position:relative;width:62px;aspect-ratio:400/670;flex:none;filter:drop-shadow(3px 3px 0 var(--o))}
 #coach .cp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 100%;animation:breathe 4.2s ease-in-out infinite}
 #coach .cb{pointer-events:auto;flex:1;background:#fffbe8;color:#141414;border:3px solid var(--o);border-radius:14px;box-shadow:4px 4px 0 var(--o);padding:9px 12px 8px;font-size:14px;line-height:1.55}
+#coach .cb .tx{display:block;min-height:4.65em}
+.tw{position:relative;display:block}
+.tw-g{visibility:hidden}
+.tw-l{position:absolute;left:0;top:0;right:0}
 #coach .cb .nm{display:block;font-size:10px;font-weight:900;color:#e0457b;margin-bottom:2px}
 #coach .cb.talk{animation:talk .32s ease}
 #coach .cbtns{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px}
@@ -827,6 +863,7 @@ b.km{color:var(--mult);font-weight:900}
       <p class="muted" id="bestLine"></p>
       <button class="iconbtn" id="btnTut" style="justify-self:start">ロコに遊び方を教わる</button>
       <button class="iconbtn" id="btnPrize2" style="justify-self:start" hidden>★ ロコのごほうびを見る</button>
+      <button class="iconbtn" id="btnHR" style="justify-self:start" hidden>★ ハイローラー仕様:ON</button>
       <button class="iconbtn" id="btnDbgToggle" style="justify-self:start">デバッグモード:OFF</button>
       <button class="btn light wide" id="btnContinue" hidden>つづきから</button>
       <button class="btn light wide" id="btnStart">はじめる</button>
@@ -892,9 +929,24 @@ b.km{color:var(--mult);font-weight:900}
     </div>
   </div>
 
+  <div class="overlay center" id="ovZoro" hidden>
+    <div class="zburst"></div>
+    <div class="zoro">
+      <div class="zlabel" id="zLabel">ZOROME</div>
+      <div class="zreels"><span>0</span><span>0</span><span>0</span></div>
+      <div class="zstamp" id="zStamp"></div>
+      <div class="zcard" id="zCard" hidden>
+        <div class="askrow"><div class="askface" id="zFace"></div><div class="bubble" id="zLine"></div></div>
+        <div class="zrelic" id="zRelic"></div>
+        <div class="zpick" id="zPick"></div>
+        <button class="btn light wide" id="zOk">受け取る</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay center" id="ovAsk" hidden>
     <div class="sheet">
-      <div class="askrow"><div class="askface" id="askFace"></div><div class="bubble">はじめて?<br>ルールの説明、聞いていく?<br>やさしく教えてあげるよ。</div></div>
+      <div class="askrow"><div class="askface" id="askFace"></div><div class="bubble" id="askLine"></div></div>
       <div class="row2"><button class="btn ghost small" id="askNo">いらない</button><button class="btn light small" id="askYes">聞く</button></div>
     </div>
   </div>
@@ -953,6 +1005,7 @@ const HB = Object.fromEntries(HANDS.map(h => [h.id, h]));
 const PAIRISH = new Set(['pair','two','three','full','four','five','pinzoro']);
 
 const SIXISH = v => v === 6;
+const ZM = {1:2, 2:3, 3:4, 4:5, 5:6, 6:6.66, 7:77, 8:8, 9:9};
 const growTxt = t => ({text:t, cls:'info', grow:1});
 const TIERNAME = ['', 'コモン', 'レア', 'レジェンド'], TIERPRICE = [0, 4, 6, 8];
 const RELICS = {
@@ -1026,6 +1079,8 @@ const RELICS = {
   // --- チンチロ ---
   hifumi:   {t:1, g:'一', name:'ヒフミ', tags:['チンチロ'], desc:'役に1・2・3が揃うとチップ+150', onHand:c => c.has(1,2,3) ? {chips:150} : null},
   shigoro:  {t:3, g:'四', name:'シゴロ', tags:['チンチロ'], desc:'役に4・5・6が揃うと倍率×3', onHand:c => c.has(4,5,6) ? {xmult:3} : null},
+  zorome:   {t:3, g:'揃', name:'ゾロ目の刻印', tags:['特別'], noShop:1, desc:'お店には並ばない。得点の下3桁がゾロ目になった瞬間だけ手に入る。刻まれた数字で倍率が決まる:111=×2、222=×3、333=×4、444=×5、555=×6、666=×6.66、888=×8、999=×9、そして777=×77',
+             val:r => String((r.d || 1)*111), onHand:(c,r) => ({xmult:ZM[r.d] || 2})},
   pinzoro:  {t:3, g:'ピ', name:'ピンゾロ', tags:['チンチロ'], lock:1, desc:'役に1が3つ以上で倍率×6', onHand:c => c.ones >= 3 ? {xmult:6} : null},
   // --- 振り直し ---
   maniac:   {t:1, g:'狂', name:'振り狂い', tags:['振り直し','成長'], desc:'振り直しを1回使うたびにチップ+10ずつ育つ',
@@ -1223,6 +1278,8 @@ function freshState(){
   };
 }
 let BEST = {round:0, hand:0};
+function hrActive(){ return !!BEST.highroller && BEST.hrOn !== false; }
+function applyHR(){ document.documentElement.classList.toggle('hr', hrActive()); }
 try { BEST = Object.assign(BEST, JSON.parse(localStorage.getItem('dice-inferno-best') || '{}')); } catch(e){}
 function saveBest(){
   BEST.round = Math.max(BEST.round, S.round); BEST.hand = Math.max(BEST.hand, S.bestHand);
@@ -2038,7 +2095,7 @@ async function startRound(){
   S.mood = !S.boss && S.round > 1 ? .9 + Math.random()*.25 : 1;
   S.adapt *= S.mood;
   if (S.adapt !== 1){ const t = S.target*S.adapt, mag = Math.pow(10, Math.max(1, Math.floor(Math.log10(t)) - 1)); S.target = Math.round(t/mag)*mag; }
-  if (!S.boss && S.round > 1){ S.phase = 'choose'; renderAll(); S.risk = await chooseRisk(S.target); if (S.risk) S.target = Math.round(S.target*1.5); }
+  if (!S.boss && S.round > 1){ S.phase = 'choose'; renderAll(); S.risk = await chooseRisk(S.target); if (S.risk){ S.target = Math.round(S.target*1.5); S.riskN = (S.riskN || 0) + 1; } else S.riskAll = false; }
   S.hands = 4 - (S.boss && S.boss.id === 'hunger' ? 1 : 0); S.handsPlayedRound = 0; S.rerolls = rollsPerHand(); S.roundRerolls = 0;
   S.dice.forEach(d => { d.value = null; d.held = false; });
   S.phase = 'intro'; renderAll();
@@ -2341,6 +2398,65 @@ async function charge(el, st, k){
   el.classList.remove('charging'); if (box) box.classList.remove('primed'); $('#dim').classList.remove('on');
 }
 
+/* ---------- ゾロ目: the last 3 digits of a hand all match ---------- */
+function zoromeDigit(t){ if (!(t >= 100 && t < 1e15)) return 0; const d = Math.floor(t) % 1000; return d && d % 111 === 0 ? d/111 : 0; }
+const ZLINES = {7:['777!? うそでしょ、大当たりじゃん!!', 'ちょっと、777って…あんた何者?', 'セブンが3つ…今日のあんた、神がかってる'],
+  6:['666…悪魔のゾロ目だね。ふふ、似合ってる'], other:['ゾロ目!? ちょ、それ刻んどきな', 'へぇ、数字がそろった。ツイてるじゃん', 'ゾロ目なんて久しぶりに見たよ']};
+async function zoromeShow(dg){
+  const ov = $('#ovZoro'), reels = [...ov.querySelectorAll('.zreels span')], st = $('#zStamp'), card = $('#zCard');
+  const j7 = dg === 7;
+  ov.classList.remove('lit', 'j7'); st.classList.remove('go'); st.textContent = ''; card.hidden = true;
+  $('#zLabel').textContent = j7 ? 'JACKPOT' : 'ZOROME';
+  reels.forEach(r => { r.className = 'spin'; r.textContent = Math.floor(Math.random()*10); });
+  ov.hidden = false; BGM.duck(true);
+  let alive = true; const spin = () => { if (!alive) return; reels.forEach(r => { if (r.classList.contains('spin')) r.textContent = Math.floor(Math.random()*10); }); setTimeout(spin, 45); }; spin();
+  for (let i = 0; i < 6; i++) setTimeout(() => hat(.08 + i*.02), i*90);
+  await sleep(reduced ? 150 : 700);
+  for (let i = 0; i < 3; i++){
+    const r = reels[i]; r.classList.remove('spin'); r.textContent = dg; retrigger(r, 'stop');
+    kick(.6 + i*.15); if (i < 2) tone(660 + i*220, .08, 'square', .05);
+    if (i === 2){ if (j7){ chargeUp(.9, 1.6); await sleep(reduced ? 100 : 900); } }
+    else await sleep(reduced ? 80 : (j7 ? 520 + i*260 : 380));
+  }
+  alive = false;
+  reels.forEach(r => r.classList.add('win'));
+  if (j7) ov.classList.add('j7');
+  ov.classList.add('lit');
+  impact(2); smp('impact', {vol:1.3}); flash(); shake(j7 ? 26 : 14, 600);
+  if (j7){ airhorn(); setTimeout(airhorn, 260); smp('sc6', {vol:1}); sparkle(1.6, 24); } else { smp('scratch', {vol:.8, dur:.6}) || wiki(.3); sparkle(.8, 12); }
+  setTimeout(() => smp('coins', {vol:1}), 200);
+  st.textContent = j7 ? '777 大当たり!!' : `${dg}${dg}${dg} ゾロ目!!`; st.classList.add('go');
+  const W = app.getBoundingClientRect();
+  for (let i = 0; i < (j7 ? 8 : 4); i++) setTimeout(() => burst(W.width*(.2 + Math.random()*.6), W.height*(.25 + Math.random()*.3), j7 ? 60 : 36, j7 ? ['#fff1a8','#ffd400','#fff','#ff9d00'] : ['#e3ad4c','#ff2d8f','#22d3ff','#fff'], j7 ? 10 : 7), i*150);
+  await sleep(reduced ? 200 : 1100);
+  // card: Roko + the relic, and a swap choice when the slots are full
+  const own = S.relics.findIndex(r => r.id === 'zorome');
+  let mode, pickIdx = -1;
+  if (own >= 0) mode = ZM[dg] > ZM[S.relics[own].d || 1] ? 'up' : 'same';
+  else mode = S.relics.length < 5 ? 'new' : 'full';
+  $('#zFace').innerHTML = `<img src="${PORTRAITS.smile || PORTRAITS.normal || Object.values(PORTRAITS)[0]}" alt="ロコ">`;
+  const zline = pick('zoro' + (j7 ? 7 : dg === 6 ? 6 : 'o'), ZLINES[j7 ? 7 : dg === 6 ? 6 : 'other']);
+  const mx = ZM[dg] === 6.66 ? '6.66' : ZM[dg];
+  $('#zRelic').innerHTML = `<b>揃</b><div>ゾロ目の刻印 <span style="color:var(--mult)">倍率×${mx}</span><small>${mode === 'up' ? `今の刻印(${(S.relics[own].d || 1)*111})がパワーアップ!` : mode === 'same' ? `もう同じか、もっと強い刻印を持ってるよ(${(S.relics[own].d || 1)*111})` : '次のハンドから、ずっと効く'}</small></div>`;
+  const pk = $('#zPick'), ok = $('#zOk');
+  pk.innerHTML = '';
+  if (mode === 'full'){
+    pk.innerHTML = '<p>レリックの枠がいっぱい。手放すレリックを選んでね</p>' + S.relics.map((r, i) => `<button data-i="${i}">${RELICS[r.id].g} ${RELICS[r.id].name}</button>`).join('') + '<button data-i="-1">あきらめる</button>';
+    ok.disabled = true; ok.textContent = '選んでね';
+    pk.onclick = e => { const b = e.target.closest('button'); if (!b) return; pickIdx = +b.dataset.i; pk.querySelectorAll('button').forEach(x => x.classList.toggle('sel', x === b)); ok.disabled = false; ok.textContent = pickIdx < 0 ? 'あきらめる' : '入れ替える'; SFX.click(); };
+  } else { ok.disabled = false; ok.textContent = mode === 'same' ? 'OK' : '受け取る'; pk.onclick = null; }
+  card.hidden = false; typeHTML($('#zLine'), zline);
+  await new Promise(res => { ok.onclick = () => { if (ok.disabled) return; res(); }; });
+  if (mode === 'new') S.relics.push({id:'zorome', d:dg});
+  else if (mode === 'up') S.relics[own].d = dg;
+  else if (mode === 'full' && pickIdx >= 0) S.relics.splice(pickIdx, 1, {id:'zorome', d:dg});
+  if (mode !== 'same' && !(mode === 'full' && pickIdx < 0)){ smp('ding', {vol:1}) || SFX.coin(); }
+  ov.hidden = true; ov.classList.remove('lit', 'j7'); BGM.duck(false);
+  renderRelics();
+  const zi = S.relics.findIndex(r => r.id === 'zorome'); if (zi >= 0 && mode !== 'same'){ const el = relicEl(zi); if (el){ retrigger(el, 'fire'); pop(el, `×${mx}`, 'xmult', true); } }
+  await sleep(300);
+}
+
 async function play(){
   if (S.phase !== 'play' || S.rollsUsed === 0 || !S.dice.some(d => d.held)) return;
   S.phase = 'scoring'; targeting = -1; setButtons(); renderHint(null); renderItems();
@@ -2412,6 +2528,7 @@ async function play(){
   }
   S.bestHand = Math.max(S.bestHand, R.total);
   await sleep(900);
+  { const zd = zoromeDigit(R.total); if (zd) await zoromeShow(zd); }
   await damage(R.total);
   S.score += R.total;
   if (S.score < S.target) growRelic('onMiss');
@@ -2441,8 +2558,11 @@ async function roundClear(){
   for (let i=0;i<4;i++) setTimeout(() => burst(pr.l + Math.random()*pr.w, pr.t + Math.random()*pr.h*.5, 40, ['#e3ad4c','#e5484d','#3f86f0','#4cb782','#fff1a8'], 8), i*140);
   await sleep(900);
   if (S.round === FINAL_ROUND && !S.won){
-    S.won = true; const first = !BEST.cleared; BEST.cleared = true; saveBest();
-    const go = await showWin(first);
+    S.won = true; const first = !BEST.cleared; BEST.cleared = true;
+    const hrNew = S.riskAll !== false && (S.riskN || 0) > 0 && !BEST.highroller;
+    if (S.riskAll !== false && (S.riskN || 0) > 0){ BEST.highroller = true; if (BEST.hrOn == null) BEST.hrOn = true; }
+    saveBest(); applyHR();
+    const go = await showWin(first, hrNew);
     if (!go) return;
   }
   const lines = [[S.risk ? 'クリア報酬(ハイリスク×2)' : 'クリア報酬', (S.boss ? 5 : 3) * (S.risk ? 2 : 1)]];
@@ -2536,7 +2656,8 @@ function say(where, text, ex='normal'){
   const n = document.querySelector(`[data-npc="${where}"]`); if (!n) return Promise.resolve();
   const tok = {}; sayTok.set(n, tok);
   setEx(n, ex); retrigger(n.querySelector('.portrait'), 'talk');
-  const out = n.querySelector('.say'); out.textContent = '';
+  const box = n.querySelector('.say'); box.innerHTML = '<span class="tw"><span class="tw-g"></span><span class="tw-l"></span></span>';
+  box.querySelector('.tw-g').textContent = text; const out = box.querySelector('.tw-l');
   return new Promise(res => {
     let i = 0;
     const step = () => {
@@ -2548,9 +2669,37 @@ function say(where, text, ex='normal'){
     step();
   });
 }
+// typewriter for HTML text (keeps <b>/<br>); tapping the bubble shows the rest at once
+function typeHTML(el, html){
+  const tok = {}; el._tok = tok;
+  el.innerHTML = `<span class="tw"><span class="tw-g">${html}</span><span class="tw-l">${html}</span></span>`;
+  const live = el.querySelector('.tw-l');
+  const nodes = [], w = document.createTreeWalker(live, NodeFilter.SHOW_TEXT); while (w.nextNode()) nodes.push(w.currentNode);
+  const full = nodes.map(n => n.nodeValue); nodes.forEach(n => n.nodeValue = '');
+  return new Promise(res => {
+    let ni = 0, ci = 0, n = 0;
+    const done = () => { el._skip = null; res(); };
+    el._skip = () => { if (el._tok !== tok) return; nodes.forEach((x, k) => x.nodeValue = full[k]); el._tok = null; done(); };
+    const step = () => {
+      if (el._tok !== tok) return;
+      while (ni < nodes.length && !full[ni].length) ni++;
+      if (ni >= nodes.length){ el._tok = null; return done(); }
+      ci++; nodes[ni].nodeValue = full[ni].slice(0, ci);
+      const ch = full[ni][ci - 1];
+      if (n++ % 2 === 0 && !/[、。!?!?…〜 \n]/.test(ch)) voiceBlip();
+      if (ci >= full[ni].length){ ni++; ci = 0; }
+      setTimeout(step, reduced ? 0 : (/[、。!?!?…]/.test(ch) ? 120 : 34));
+    };
+    step();
+  });
+}
+document.addEventListener('click', e => { const b = e.target.closest('#coach .cb, #ovAsk .bubble, #zLine'); if (!b || e.target.closest('button')) return; const t = b.matches('#coach .cb') ? b.querySelector('.tx') : b; if (t && t._skip) return t._skip();
+  if (b.matches('#coach .cb')){ const ok = b.querySelector('.ok'); if (ok && !ok.hidden && ok.textContent.startsWith('つぎ')) ok.click(); } });
 const lastLine = {};
 function pick(key, arr){ let l; do { l = rnd(arr); } while (arr.length > 1 && l === lastLine[key]); lastLine[key] = l; return l; }
 const LINES = {
+  hrGreet:['おかえり、ハイローラー。今日も全部賭けてくの?', '来たね、ハイローラー。あんたの席、空けといたよ', 'ハイリスクしか選ばない人なんて、あんたくらいだよ。…嫌いじゃない', '胴元、あんたの名前聞いただけで顔しかめてたよ', 'ふふ、その金ピカの画面、似合ってるじゃん'],
+  hrShop:['ハイローラー様には、ちょっといいの並べといたよ。…嘘だけど', 'また全部賭けるんでしょ。止めないよ', 'あんたの勝ち方、見てて心臓に悪いんだけど', '常連のハイローラーさん、今日は何にする?'],
   greet: ['いらっしゃい。…ま、ゆっくりしてきなよ', '来たんだ。今日はどこまで行けるかな', 'ダイス振りに来たの?いいよ、付き合ったげる', 'おかえり。…別に待ってたわけじゃないけど', 'お、また来た。懲りないねぇ、好きだよそういうの', '胴元、今日も機嫌悪いってさ。気をつけなよ'],
   clear: ['へぇ、やるじゃん', 'いい振りしてたね。ちゃんと見てたよ', 'ふふ、悪くないね。ほら、買い物していきな', 'おつかれ。今のはちょっと痺れたかも', 'ふーん、運だけじゃないんだ', '次も勝てる?…ま、期待しとく'],
   boss:  ['ボス倒したんだ。…ちょっと見直したかも', 'あのボスに勝ったの?やるね', 'へぇ、ボス相手に顔色ひとつ変えないんだ', 'ボス撃破のお祝いは…買い物で返してよね'],
@@ -2579,7 +2728,7 @@ function tierWeights(){
   return r <= 2 ? [0, 100, 12, 0] : r <= 5 ? [0, 70, 35, 6] : r <= 8 ? [0, 50, 45, 16] : [0, 40, 45, 26];
 }
 function weightedRelic(exclude){
-  const pool = Object.keys(RELICS).filter(id => !exclude.has(id) && (!RELICS[id].lock || BEST.cleared));
+  const pool = Object.keys(RELICS).filter(id => !exclude.has(id) && !RELICS[id].noShop && (!RELICS[id].lock || BEST.cleared));
   if (!pool.length) return null;
   const tw = tierWeights(), ownTags = new Set(S.relics.flatMap(r => RELICS[r.id].tags.filter(t => t !== '基本')));
   const early = S.round <= 3, mid = S.round <= 5;
@@ -2634,6 +2783,7 @@ function openShop(regen=true){
   if (S.round + 1 === FINAL_ROUND) say('shop', pick('final', LINES.final), 'normal');
   else if (r.ratio >= 3) say('shop', pick('huge', LINES.huge), 'normal');
   else if (r.boss) say('shop', pick('boss', LINES.boss), 'normal');
+  else if (hrActive() && Math.random() < .5) say('shop', pick('hrShop', LINES.hrShop), 'normal');
   else say('shop', pick('clear', LINES.clear), 'normal');
 }
 function itemInfo(it){
@@ -2744,13 +2894,14 @@ function gameOver(){
   else if (Math.random() < (S.round > 3 ? .7 : .2)) say('over', pick('comfort', LINES.comfort), 'comfort');
   else say('over', pick('tease', LINES.tease), 'smug');
 }
-function showWin(first){
+function showWin(first, hrNew){
   S.phase = 'win'; SFX.win(); setTimeout(SFX.win, 450);
   const pr = rel(panelEl); for (let i=0;i<8;i++) setTimeout(() => burst(pr.l + Math.random()*pr.w, pr.t + Math.random()*pr.h, 50, ['#e3ad4c','#fff1a8','#e5484d','#3f86f0','#4cb782'], 9), i*160);
   $('#winStats').innerHTML = `<div class="stat"><span>最高ハンド</span><span>${fmt(S.bestHand)}</span></div>`
-    + (first ? `<p class="muted">新しいレリックが解放された:${Object.values(RELICS).filter(d => d.lock).map(d => d.name).join('、')}</p>` : '');
+    + (first ? `<p class="muted">新しいレリックが解放された:${Object.values(RELICS).filter(d => d.lock).map(d => d.name).join('、')}</p>` : '')
+    + (hrNew ? `<p style="color:var(--gold);font-weight:800">★ハイローラー解放!全部ハイリスクで勝ったごほうびに、画面が黒と金のハイローラー仕様になったよ。ロコのセリフも変わるかも。</p>` : '');
   $('#ovWin').hidden = false;
-  say('win', pick('win', LINES.win), 'happy');
+  say('win', hrNew ? 'え、全部ハイリスクで勝ったの?…あんた、ほんとにイカれてる。最高のハイローラーだね' : pick('win', LINES.win), 'happy');
   return new Promise(res => {
     $('#btnEndless').onclick = () => { $('#ovWin').hidden = true; res(true); };
     $('#btnWinTitle').onclick = () => { $('#ovWin').hidden = true; saveBest(); clearRun(); S = freshState(); renderAll(); showStart(); res(false); };
@@ -2775,9 +2926,10 @@ function showStart(now){
   if (BGM.playing) BGM.setMode('title');
   $('#bestLine').textContent = (BEST.cleared ? '★クリア済み ' : `ラウンド${FINAL_ROUND}の胴元を倒せばクリア。`) + (BEST.round ? `自己ベスト:ラウンド${BEST.round}/最高ハンド ${fmt(BEST.hand)}` : '');
   $('#btnPrize2').hidden = !BEST.cleared;
+  $('#btnHR').hidden = !BEST.highroller; $('#btnHR').textContent = `★ ハイローラー仕様:${BEST.hrOn !== false ? 'ON' : 'OFF'}`;
   { const r = loadRun(), c = $('#btnContinue'), st = $('#btnStart'); c.hidden = !r; if (r) c.textContent = `つづきから(${runLabel(r)})`; st.className = r ? 'btn ghost wide' : 'btn light wide'; st.textContent = 'はじめる'; }
   $('#ovStart').hidden = false;
-  setTimeout(() => say('start', pick('greet', LINES.greet), 'normal'), now ? 150 : 250);
+  setTimeout(() => say('start', hrActive() ? pick('hrGreet', LINES.hrGreet) : pick('greet', LINES.greet), 'normal'), now ? 150 : 250);
 }
 
 /* ---------- debug mode ---------- */
@@ -2794,7 +2946,7 @@ function renderDebug(){
       <button data-a="clear">ノルマ撃破してクリア</button><button data-a="rerolls">振り直し+4</button></div>
       <p class="muted">今:ラウンド${S.round}/所持金$${S.money}/振り直し${S.rerolls}</p></div>
     <div class="dbgsec"><h3>サウンドテスト(もらった音)</h3><div class="dbgbtns">${[["scratch","スクラッチ"],["impact","衝撃"],["rumble","地鳴り"],["bass","ベース"],["coins","小銭(入金)"],["ding","チーン(購入)"],["scClear","クリア"],["scDrums","ボス登場"],["clap1","得点確定(拍手1)"],["clap2","得点確定(拍手2)"],["sc6","高得点"],["sc2","キープ"],["sc1","キープ解除"]].map(([k,n]) => `<button data-a="snd" data-v="${k}">${n}</button>`).join("")}</div></div>
-    <div class="dbgsec"><h3>演出テスト</h3><div class="dbgbtns">${awk.map(([n, k]) => `<button data-a="fx" data-v="${k}">${n}</button>`).join('')}</div></div>
+    <div class="dbgsec"><h3>演出テスト</h3><div class="dbgbtns">${awk.map(([n, k]) => `<button data-a="fx" data-v="${k}">${n}</button>`).join('')}<button data-a="zoro" data-v="3">ゾロ目333</button><button data-a="zoro" data-v="7">ゾロ目777</button><button data-a="hr">ハイローラー解放</button></div></div>
     <div class="dbgsec"><h3>ダイスの目とインクを設定(全部選択済みにして、すぐ「出す」できる)</h3>
       ${S.dice.map((d, i) => `<div class="dbgrow"><span>ダイス${i+1}</span>
         <select id="dbgV${i}">${[1,2,3,4,5,6,7,8,9].map(v => `<option ${v === (d.value || 1) ? 'selected' : ''}>${v}</option>`).join('')}</select>
@@ -2822,6 +2974,8 @@ $('#dbgSheet').addEventListener('click', async e => {
   }
   if (a === 'clear'){ if (S.phase !== 'play'){ toast('対戦中だけ使える'); return; } $('#ovDbg').hidden = true; S.score = S.target; renderHud(); roundClear(); return; }
   if (a === 'snd'){ initAudio(); smp(v); return; }
+  if (a === 'zoro'){ $('#ovDbg').hidden = true; initAudio(); await zoromeShow(+v); $('#ovDbg').hidden = false; renderDebug(); return; }
+  if (a === 'hr'){ BEST.highroller = !BEST.highroller; BEST.hrOn = true; saveBest(); applyHR(); toast(BEST.highroller ? 'ハイローラー解放' : 'ハイローラー解除'); return; }
   if (a === 'fx'){ $('#ovDbg').hidden = true; initAudio(); if (v === 'eye') await cut666(true); else if (v === 'six') await cut666(false); else await awaken(v); $('#ovDbg').hidden = false; return; }
   renderAll(); if (S.phase === 'shop') renderShop(); renderDebug();
 });
@@ -2915,7 +3069,7 @@ $('#btnStart').onclick = () => {
   if (!tutSeen()){
     SFX.click();
     $('#askFace').innerHTML = `<img src="${PORTRAITS.normal || Object.values(PORTRAITS)[0]}" alt="ロコ">`;
-    $('#ovAsk').hidden = false; return;
+    $('#ovAsk').hidden = false; typeHTML($('#askLine'), 'はじめて?<br>ルールの説明、聞いていく?<br>やさしく教えてあげるよ。'); return;
   }
   newGame(false);
 };
@@ -2981,31 +3135,43 @@ const kept = () => S && S.dice.some(d => d.held);
 const freeScreen = () => $('#banner').hidden && $('#ovRisk').hidden && $('#ovInfo').hidden && $('#ovTable').hidden && $('#ovConfirm').hidden;
 const TUT_STEPS = [
   {t:'#btnRoll', when:() => S.phase === 'play' && S.rollsUsed === 0 && !shaking, done:() => shaking || S.rollsUsed > 0,
-   x:'いらっしゃい。ルールはかんたんだから安心してね。まずは下の<b>「振る」</b>を押してみて。サイコロが5個、回り出すよ。'},
+   x:'いらっしゃい。ルールはかんたんだから、安心してね。|まずは下の<b>「振る」</b>を押してみて。サイコロが5個、回り出すよ。'},
   {t:'#btnRoll', when:() => shaking, done:() => S.rollsUsed > 0 && !shaking && S.phase === 'play',
    x:'いいね。もう一回<b>「振る」</b>を押すと、サイコロが<b>1個ずつ止まる</b>よ。'},
   {t:'#tray', when:() => S.phase === 'play' && S.rollsUsed > 0, done:() => kept(),
-   x:'サイコロを<b>タップして選んで</b>みて。<b>同じ目</b>をそろえたり、1・2・3みたいに<b>続いた目</b>を集めると<b>「役」</b>になるの。どんな役があるかは左下の<b>「役」</b>ボタンで、サイコロの例つきで見られるよ。'},
+   x:'サイコロを<b>タップして選んで</b>みて。|<b>同じ目</b>をそろえたり、1・2・3みたいに<b>続いた目</b>を集めると<b>「役」</b>になるの。|どんな役があるかは、左下の<b>「役」</b>ボタンで見られるよ。'},
   {t:'#cm', when:() => S.phase === 'play' && kept(), ok:true,
-   x:'役が決まると、青い<b style="color:var(--chip)">チップ</b>と赤い<b style="color:var(--mult)">倍率</b>が出るよ。得点は<b>チップ × 倍率</b>。たとえばチップ30・倍率3なら、30×3で<b>90点</b>ね。'},
+   x:'役が決まると、青い<b style="color:var(--chip)">チップ</b>と赤い<b style="color:var(--mult)">倍率</b>が出るよ。|得点は<b>チップ × 倍率</b>。|たとえばチップ30・倍率3なら、30×3で<b>90点</b>ね。'},
   {t:'#cm', when:() => S.phase === 'play' && kept(), ok:true,
-   x:'ここがコツ。チップを10足しても少ししか増えないけど、<b style="color:var(--mult)">倍率</b>を1上げると、得点がまるごと増えるの。<b>高得点を狙うなら倍率</b>を上げるのがいちばん強いよ。'},
+   x:'ここがコツ。チップを10足しても、得点は少ししか増えないの。|でも<b style="color:var(--mult)">倍率</b>を1上げると、得点がまるごと増える。|<b>高得点を狙うなら倍率</b>。これ、覚えといてね。'},
   {t:'.controls', when:() => S.phase === 'play', done:() => S.phase === 'scoring' || S.handsPlayedRound > 0,
-   x:'いまいちなら<b>「振り直す」</b>。選んだサイコロはそのまま残して、ほかのだけ振り直せるよ。振り直しは<b>ラウンド全部で4回まで</b>だから、大事に使ってね。これでいいと思ったら<b>「出す」</b>を押して。'},
+   x:'いまいちなら<b>「振り直す」</b>。|選んだサイコロは残して、ほかのだけ振り直せるよ。|振り直しは<b>ラウンド全部で4回まで</b>。大事に使ってね。|これでいいと思ったら<b>「出す」</b>を押して。'},
   {t:'#goal', when:() => S.phase === 'play' && S.handsPlayedRound > 0, ok:true, skipIf:() => S.phase === 'clear' || S.phase === 'shop',
-   x:'出した得点のぶん、上の<b>ノルマ</b>が減っていくよ。<b>「出す」は1ラウンドに4回</b>まで。そのあいだにノルマを0にできたら勝ち!'},
+   x:'出した得点のぶん、上の<b>ノルマ</b>が減っていくよ。|<b>「出す」は1ラウンドに4回</b>まで。|そのあいだにノルマを0にできたら、勝ち!'},
   {t:'#shopItems', noFace:true, when:() => S.phase === 'shop' && !$('#ovShop').hidden && $('#ovConfirm').hidden, ok:true,
-   x:'勝つとお金がもらえて、うちのお店で買い物ができるよ。<b>レリック</b>は持ってるだけで効くお守り。<b>アイテム</b>は対戦中にサイコロに使う道具ね。まずは<b style="color:var(--mult)">倍率</b>が上がるレリックを探すのがおすすめ。'},
+   x:'勝つとお金がもらえて、うちのお店で買い物ができるよ。|<b>レリック</b>は、持ってるだけで効くお守り。|<b>アイテム</b>は、対戦中にサイコロに使う道具ね。|まずは<b style="color:var(--mult)">倍率</b>が上がるレリックを探すのがおすすめ。'},
   {t:'#shopItems', noFace:true, when:() => S.phase === 'shop' && !$('#ovShop').hidden && $('#ovConfirm').hidden, ok:true,
-   x:'それとね、サイコロもレリックもアイテムも、<b>長押し</b>すると効果が見られるよ。迷ったら長押し。これで説明はおしまい。楽しんでね!'},
+   x:'それとね、サイコロもレリックもアイテムも、<b>長押し</b>で効果が見られるよ。|迷ったら長押し。これで説明はおしまい。楽しんでね!'},
 ];
 function tutStart(){
   if (tutSeen() || TUT.on) return;
   TUT.on = true; TUT.step = 0; TUT.shown = -1;
   const cp = $('#coach .cp'); cp.innerHTML = `<img src="${PORTRAITS.normal || Object.values(PORTRAITS)[0]}" alt="">`;
   $('#coach .skip').onclick = () => tutEnd();
-  $('#coach .ok').onclick = () => { SFX.click(); TUT.step++; TUT.shown = -1; tutTick(); };
+  $('#coach .ok').onclick = () => { SFX.click(); const st = TUT_STEPS[TUT.step]; if (st && TUT.page < tutPages(st).length - 1){ TUT.page++; tutPage(); } else { TUT.step++; TUT.shown = -1; tutTick(); } };
   clearInterval(TUT.iv); TUT.iv = setInterval(tutTick, 150);
+}
+const tutPages = st => st.x.split('|');
+function tutPage(){
+  const st = TUT_STEPS[TUT.step]; if (!st) return;
+  const co = $('#coach'), okb = co.querySelector('.ok'), pages = tutPages(st), my = TUT.step + ':' + TUT.page;
+  okb.hidden = true;
+  retrigger(co.querySelector('.cb'), 'talk');
+  typeHTML(co.querySelector('.tx'), pages[TUT.page]).then(() => {
+    if (!TUT.on || TUT.step + ':' + TUT.page !== my) return;
+    if (TUT.page < pages.length - 1){ okb.textContent = 'つぎ ▶'; okb.hidden = false; }
+    else { okb.textContent = 'わかった'; okb.hidden = !st.ok; }
+  });
 }
 function tutEnd(){
   TUT.on = false; clearInterval(TUT.iv); $('#coach').hidden = true; $('#spot').hidden = true;
@@ -3025,14 +3191,16 @@ function tutTick(){
   co.classList.toggle('top', low); co.classList.toggle('bot', !low);
   if (TUT.shown !== TUT.step){
     TUT.shown = TUT.step;
-    co.querySelector('.tx').innerHTML = st.x;
-    co.querySelector('.ok').hidden = !st.ok; co.querySelector('.cp').hidden = !!st.noFace;
+    TUT.page = 0; tutPage();
+    co.querySelector('.cp').hidden = !!st.noFace;
     co.querySelector('.tap').textContent = `${TUT.step + 1} / ${TUT_STEPS.length}`;
     retrigger(co.querySelector('.cb'), 'talk');
   }
   co.hidden = false;
 }
 $('#btnTut').onclick = () => { SFX.click(); newGame(true); };
+$('#btnHR').onclick = () => { BEST.hrOn = BEST.hrOn === false; saveBest(); applyHR(); SFX.click(); $('#btnHR').textContent = `★ ハイローラー仕様:${BEST.hrOn ? 'ON' : 'OFF'}`; };
+applyHR();
 
 /* ---------- boot (keeps a run alive across page updates) ---------- */
 window.claude?.hot?.snapshot?.(() => ({S: S ? JSON.parse(JSON.stringify(S)) : null}));
