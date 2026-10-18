@@ -363,6 +363,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .askrow{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center}
 .askface{position:relative;width:92px;aspect-ratio:400/670}
 .askface img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:50% 100%;animation:breathe 4.2s ease-in-out infinite}
+#ovWin .ach{display:flex;gap:12px;align-items:center;justify-self:center;padding:10px 18px 10px 12px;background:linear-gradient(#2d2140,#1a1424);border:3px solid #000;border-radius:14px;box-shadow:4px 4px 0 #000,0 0 0 2px var(--gold) inset;animation:achIn .5s cubic-bezier(.2,1.6,.4,1) .3s both}
+#ovWin .ach-i{font-size:30px;filter:drop-shadow(2px 2px 0 #000)}
+#ovWin .ach small{display:block;font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--gold)}
+#ovWin .ach b{font-size:18px}
+@keyframes achIn{from{opacity:0;transform:translateY(-14px) scale(.8)}}
 #btnStart.confirm{background:var(--mult);color:#fff}
 #ovZoro{background:radial-gradient(circle at 50% 42%, #3a1f5c 0%, #0b0810 70%);overflow:hidden;z-index:80}
 #ovZoro .zburst{position:absolute;left:50%;top:40%;width:220vmax;height:220vmax;transform:translate(-50%,-50%);background:repeating-conic-gradient(rgba(255,255,255,.07) 0 6deg, transparent 6deg 18deg);animation:zspin 14s linear infinite;pointer-events:none;opacity:.0;transition:opacity .4s}
@@ -909,11 +914,13 @@ b.km{color:var(--mult);font-weight:900}
   </div>
   <div class="overlay center" id="ovWin" hidden>
     <div class="sheet">
-      <h2 style="color:var(--gold)">胴元撃破!クリア!</h2>
+      <h2 style="color:var(--gold)">胴元撃破!体験版クリア!</h2>
+      <div class="ach"><span class="ach-i">🏆</span><div><small>実績解除</small><b>体験版クリア</b></div></div>
       <div class="npc" data-npc="win"></div>
       <div id="winStats"></div>
       <button class="btn light wide" id="btnPrize">ロコからのごほうび</button>
-      <div class="row2"><button class="btn ghost small" id="btnWinTitle">タイトルへ</button><button class="btn light small" id="btnEndless">エンドレスへ</button></div>
+      <p class="muted" style="text-align:center;margin:0">遊んでくれてありがとう!製品版、準備中だよ。</p>
+      <button class="btn ghost wide" id="btnWinTitle">タイトルへ</button>
     </div>
   </div>
 
@@ -1006,6 +1013,8 @@ const PAIRISH = new Set(['pair','two','three','full','four','five','pinzoro']);
 
 const SIXISH = v => v === 6;
 const ZM = {1:2, 2:3, 3:4, 4:5, 5:6, 6:6.66, 7:77, 8:8, 9:9};
+// feature switches: the demo keeps some product-version content turned off
+const FEATURES = {zorome:false};
 const growTxt = t => ({text:t, cls:'info', grow:1});
 const TIERNAME = ['', 'コモン', 'レア', 'レジェンド'], TIERPRICE = [0, 4, 6, 8];
 const RELICS = {
@@ -2103,7 +2112,7 @@ async function startRound(){
   if (final){ SFX.bad(); SFX.boom(4); shake(14, 600); await banner('FINAL BOSS', `${S.boss.name}:${S.boss.desc}`, true); }
   else if (S.boss && S.boss.meta){ SFX.bad(); shake(6, 300); await banner('BUILD HUNTER', `${S.boss.name}:${S.boss.desc}(そのぶんノルマは控えめ)`, true); }
   else if (S.boss){ SFX.bad(); await banner('BOSS', `${S.boss.name}:${S.boss.desc}`, true); }
-  else await banner(`ラウンド ${S.round}`, `${S.risk ? 'ハイリスク ' : ''}ノルマ ${fmt(S.target)}` + (Math.abs(S.adapt - 1) >= .03 ? (avg >= 1.5 && S.adapt > 1.05 ? `(余裕そうだから +${Math.round((S.adapt-1)*100)}%)` : `(胴元の気分 ${S.adapt > 1 ? '+' : ''}${Math.round((S.adapt-1)*100)}%)`) : ''));
+  else await banner(`ラウンド ${S.round}`, `${S.risk ? 'ハイリスク ' : ''}ノルマ ${fmt(S.target)}` + (Math.abs(S.mood - 1) >= .03 ? `(胴元の気分 ${S.mood > 1 ? '+' : ''}${Math.round((S.mood-1)*100)}%)` : ''));
   newHand();
 }
 
@@ -2528,7 +2537,7 @@ async function play(){
   }
   S.bestHand = Math.max(S.bestHand, R.total);
   await sleep(900);
-  { const zd = zoromeDigit(R.total); if (zd) await zoromeShow(zd); }
+  if (FEATURES.zorome){ const zd = zoromeDigit(R.total); if (zd) await zoromeShow(zd); }
   await damage(R.total);
   S.score += R.total;
   if (S.score < S.target) growRelic('onMiss');
@@ -2723,6 +2732,7 @@ const LINES = {
 };
 
 /* ---------- shop ---------- */
+if (!FEATURES.zorome) delete RELICS.zorome;
 function tierWeights(){
   const r = S.round;
   return r <= 2 ? [0, 100, 12, 0] : r <= 5 ? [0, 70, 35, 6] : r <= 8 ? [0, 50, 45, 16] : [0, 40, 45, 26];
@@ -2903,7 +2913,6 @@ function showWin(first, hrNew){
   $('#ovWin').hidden = false;
   say('win', hrNew ? 'え、全部ハイリスクで勝ったの?…あんた、ほんとにイカれてる。最高のハイローラーだね' : pick('win', LINES.win), 'happy');
   return new Promise(res => {
-    $('#btnEndless').onclick = () => { $('#ovWin').hidden = true; res(true); };
     $('#btnWinTitle').onclick = () => { $('#ovWin').hidden = true; saveBest(); clearRun(); S = freshState(); renderAll(); showStart(); res(false); };
   });
 }
@@ -2924,7 +2933,7 @@ async function playOpening(){
 }
 function showStart(now){
   if (BGM.playing) BGM.setMode('title');
-  $('#bestLine').textContent = (BEST.cleared ? '★クリア済み ' : `ラウンド${FINAL_ROUND}の胴元を倒せばクリア。`) + (BEST.round ? `自己ベスト:ラウンド${BEST.round}/最高ハンド ${fmt(BEST.hand)}` : '');
+  $('#bestLine').textContent = (BEST.cleared ? '★体験版クリア済み ' : `ラウンド${FINAL_ROUND}の胴元を倒せばクリア。`) + (BEST.round ? `自己ベスト:ラウンド${BEST.round}/最高ハンド ${fmt(BEST.hand)}` : '');
   $('#btnPrize2').hidden = !BEST.cleared;
   $('#btnHR').hidden = !BEST.highroller; $('#btnHR').textContent = `★ ハイローラー仕様:${BEST.hrOn !== false ? 'ON' : 'OFF'}`;
   { const r = loadRun(), c = $('#btnContinue'), st = $('#btnStart'); c.hidden = !r; if (r) c.textContent = `つづきから(${runLabel(r)})`; st.className = r ? 'btn ghost wide' : 'btn light wide'; st.textContent = 'はじめる'; }
@@ -2946,7 +2955,7 @@ function renderDebug(){
       <button data-a="clear">ノルマ撃破してクリア</button><button data-a="rerolls">振り直し+4</button></div>
       <p class="muted">今:ラウンド${S.round}/所持金$${S.money}/振り直し${S.rerolls}</p></div>
     <div class="dbgsec"><h3>サウンドテスト(もらった音)</h3><div class="dbgbtns">${[["scratch","スクラッチ"],["impact","衝撃"],["rumble","地鳴り"],["bass","ベース"],["coins","小銭(入金)"],["ding","チーン(購入)"],["scClear","クリア"],["scDrums","ボス登場"],["clap1","得点確定(拍手1)"],["clap2","得点確定(拍手2)"],["sc6","高得点"],["sc2","キープ"],["sc1","キープ解除"]].map(([k,n]) => `<button data-a="snd" data-v="${k}">${n}</button>`).join("")}</div></div>
-    <div class="dbgsec"><h3>演出テスト</h3><div class="dbgbtns">${awk.map(([n, k]) => `<button data-a="fx" data-v="${k}">${n}</button>`).join('')}<button data-a="zoro" data-v="3">ゾロ目333</button><button data-a="zoro" data-v="7">ゾロ目777</button><button data-a="hr">ハイローラー解放</button></div></div>
+    <div class="dbgsec"><h3>演出テスト</h3><div class="dbgbtns">${awk.map(([n, k]) => `<button data-a="fx" data-v="${k}">${n}</button>`).join('')}${FEATURES.zorome ? '<button data-a="zoro" data-v="3">ゾロ目333</button><button data-a="zoro" data-v="7">ゾロ目777</button>' : ''}<button data-a="hr">ハイローラー解放</button></div></div>
     <div class="dbgsec"><h3>ダイスの目とインクを設定(全部選択済みにして、すぐ「出す」できる)</h3>
       ${S.dice.map((d, i) => `<div class="dbgrow"><span>ダイス${i+1}</span>
         <select id="dbgV${i}">${[1,2,3,4,5,6,7,8,9].map(v => `<option ${v === (d.value || 1) ? 'selected' : ''}>${v}</option>`).join('')}</select>
@@ -3046,7 +3055,7 @@ function runLabel(r){ return r.mode === 'shop' ? `ラウンド${r.S.round}クリ
 function continueRun(){
   const r = loadRun(); if (!r) return;
   initAudio(); BGM.outro(); $('#ovStart').hidden = true;
-  S = Object.assign(freshState(), r.S); S.items = S.items || []; S.bestHand = S.bestHand || 0;
+  S = Object.assign(freshState(), r.S); S.items = S.items || []; S.bestHand = S.bestHand || 0; S.relics = (S.relics || []).filter(x => RELICS[x.id]);
   S.dice.forEach(d => { d.held = false; });
   renderAll();
   if (r.mode === 'shop') openShop(!S.shop);
@@ -3209,7 +3218,7 @@ function boot(data){
   if (old && old.phase !== 'start' && old.dice){
     S = Object.assign(freshState(), old);
     if (S.rerollsUsed != null && S.rollsUsed == null) S.rollsUsed = S.rerollsUsed;
-    S.items = S.items || [];
+    S.items = S.items || []; S.relics = (S.relics || []).filter(x => RELICS[x.id]);
     $('#ovStart').hidden = true;
     if (S.phase === 'over'){ renderAll(); gameOver(); return; }
     if (S.phase === 'shop' || S.phase === 'clear'){ renderAll(); openShop(!S.shop); return; }
