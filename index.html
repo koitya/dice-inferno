@@ -2148,7 +2148,7 @@ async function startRound(){
   const pk = S.peaks || [], power = pk.length ? pk.reduce((a, b) => a + b, 0)/pk.length : 0;
   const hunted = !!(S.boss && S.boss.meta);
   const k = (S.round <= 4 ? .6 : S.round <= 8 ? 1.2 : 2.0) * (S.boss && !hunted ? 1.3 : 1);
-  let t = Math.max(base, power*k);
+  let t = S.round <= 3 ? base : Math.max(base, power*k);   // rounds 1-3 keep the original fixed quota
   if (S.lastTarget) t = Math.min(t, Math.max(base, S.lastTarget*2.5));
   S.mood = !S.boss && S.round > 1 ? .9 + Math.random()*.25 : 1;
   t *= S.mood;
