@@ -2141,15 +2141,21 @@ async function startRound(){
   S.boss = final ? FINAL_BOSS : S.round % 3 === 0 ? rnd(BOSSES) : null;
   if (S.boss && !final && S.round >= 6){ const b = detectBuild(); if (b && Math.random() < .75) S.boss = {id:'meta', meta:b, ...META[b]}; }
   BGM.setMode('play');
-  S.target = targetFor(S.round, !!S.boss, final, !!(S.boss && S.boss.meta)); S.score = 0; S.risk = false;
-  const rec = S.recent || [], avg = rec.length >= 2 ? rec.reduce((a,b) => a+b, 0)/rec.length : 0;
-  // the house reads you: the more you've been overshooting lately, the higher it sets the bar (up to +60%),
-  // and normal rounds also wobble a little either way so no two runs feel the same
+  const base = targetFor(S.round, !!S.boss, final, !!(S.boss && S.boss.meta)); S.score = 0; S.risk = false;
+  // the house reads you: the quota follows your recent best hands (average of the last two rounds' best),
+  // never drops below the base quota, and never jumps more than 2.5x the previous round's quota in one step
+  if (S.roundBest){ S.peaks = [...(S.peaks || []), S.roundBest].slice(-2); S.roundBest = 0; }
+  const pk = S.peaks || [], power = pk.length ? pk.reduce((a, b) => a + b, 0)/pk.length : 0;
   const hunted = !!(S.boss && S.boss.meta);
-  S.adapt = !hunted && avg >= 1.5 ? Math.min(1.6, 1 + (avg - 1.5)*0.12) : 1;
+  const k = (S.round <= 4 ? .6 : S.round <= 8 ? 1.2 : 2.0) * (S.boss && !hunted ? 1.3 : 1);
+  let t = Math.max(base, power*k);
+  if (S.lastTarget) t = Math.min(t, Math.max(base, S.lastTarget*2.5));
   S.mood = !S.boss && S.round > 1 ? .9 + Math.random()*.25 : 1;
-  S.adapt *= S.mood;
-  if (S.adapt !== 1){ const t = S.target*S.adapt, mag = Math.pow(10, Math.max(1, Math.floor(Math.log10(t)) - 1)); S.target = Math.round(t/mag)*mag; }
+  t *= S.mood;
+  t = Math.max(base*.9, t);
+  if (!isFinite(t)) t = base;
+  { const mag = Math.pow(10, Math.max(1, Math.floor(Math.log10(t)) - 1)); S.target = Math.round(t/mag)*mag; }
+  S.lastTarget = S.target;
   if (!S.boss && S.round > 1){ S.phase = 'choose'; renderAll(); S.risk = await chooseRisk(S.target); if (S.risk){ S.target = Math.round(S.target*1.5); S.riskN = (S.riskN || 0) + 1; } else S.riskAll = false; }
   S.hands = 4 - (S.boss && S.boss.id === 'hunger' ? 1 : 0); S.handsPlayedRound = 0; S.rerolls = rollsPerHand(); S.roundRerolls = 0;
   S.dice.forEach(d => { d.value = null; d.held = false; });
@@ -2589,7 +2595,7 @@ async function play(){
   if (R.total >= S.target && S.score === 0){
     const s = document.createElement('div'); s.className = 'tag-oneshot'; s.textContent = '一撃!!'; panelEl.append(s); SFX.win();
   }
-  S.bestHand = Math.max(S.bestHand, R.total);
+  S.bestHand = Math.max(S.bestHand, R.total); S.roundBest = Math.max(S.roundBest || 0, R.total);
   await sleep(900);
   if (FEATURES.zorome){ const zd = zoromeDigit(R.total); if (zd) await zoromeShow(zd); }
   await damage(R.total);
