@@ -1815,11 +1815,12 @@ function rollsPerHand(){
   const n = 4 - S.relics.filter(r => r.id === 'blood').length - (S.boss && (S.boss.id === 'gravity' || S.boss.id === 'final' || S.boss.meta === '振り直し') ? 1 : 0);
   return Math.max(0, n);
 }
+// quotas are always round numbers: 2 significant digits, and the last two digits are always 00
+function niceQuota(t){ if (!isFinite(t) || t <= 0) return 100; const mag = Math.max(100, Math.pow(10, Math.floor(Math.log10(t)) - 1)); return Math.max(100, Math.round(t/mag)*mag); }
 function targetFor(r, boss, final, meta){
   let t = 300; for (let k = 2; k <= r; k++) t *= k <= 3 ? 1.8 : k <= 9 ? 1.8 : 1.65;  // steeper through the middle rounds
   if (final) t *= 2.2; else if (meta) t *= 1.2; else if (boss) t *= 1.5;
-  const mag = Math.pow(10, Math.max(1, Math.floor(Math.log10(t)) - 1));
-  return Math.round(t/mag)*mag;
+  return niceQuota(t);
 }
 function effText(e){
   if (e.text) return e.text;
@@ -2154,9 +2155,9 @@ async function startRound(){
   t *= S.mood;
   t = Math.max(base*.9, t);
   if (!isFinite(t)) t = base;
-  { const mag = Math.pow(10, Math.max(1, Math.floor(Math.log10(t)) - 1)); S.target = Math.round(t/mag)*mag; }
+  S.target = niceQuota(t);
   S.lastTarget = S.target;
-  if (!S.boss && S.round > 1){ S.phase = 'choose'; renderAll(); S.risk = await chooseRisk(S.target); if (S.risk){ S.target = Math.round(S.target*1.5); S.riskN = (S.riskN || 0) + 1; } else S.riskAll = false; }
+  if (!S.boss && S.round > 1){ S.phase = 'choose'; renderAll(); S.risk = await chooseRisk(S.target); if (S.risk){ S.target = niceQuota(S.target*1.5); S.riskN = (S.riskN || 0) + 1; } else S.riskAll = false; }
   S.hands = 4 - (S.boss && S.boss.id === 'hunger' ? 1 : 0); S.handsPlayedRound = 0; S.rerolls = rollsPerHand(); S.roundRerolls = 0;
   S.dice.forEach(d => { d.value = null; d.held = false; });
   S.phase = 'intro'; renderAll();
