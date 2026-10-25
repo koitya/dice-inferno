@@ -196,9 +196,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .die.m-steel .body{background:linear-gradient(145deg,#e7a06a,#b8693a 50%,#8a4622);box-shadow:0 4px 0 #5a2c14} .die.m-steel .face i.on{background:#3a1a08} .die.m-steel .badge{color:#e7a06a}
 .die.m-gold .body{background:#e3ad4c;box-shadow:0 4px 0 #946a1c} .die.m-gold .badge{color:var(--gold)}
 .die.m-glass .body{background:rgba(190,220,250,.55);box-shadow:0 4px 0 rgba(90,130,180,.8)} .die.m-glass .badge{color:#a8d0f5}
-.die.m-lucky .body{background:#5fc28c;box-shadow:0 4px 0 #2c7a50}
-.die.lucky-hit .body{box-shadow:0 4px 0 #2c7a50,0 0 0 3px #fff1a8,0 0 16px 2px #5fe09a;animation:luckyPulse 1.2s ease-in-out infinite}
-@keyframes luckyPulse{50%{box-shadow:0 4px 0 #2c7a50,0 0 0 3px #fff1a8,0 0 26px 6px #5fe09a}} .die.m-lucky .badge{color:var(--ok)}
+.die.m-lucky .body{background:#5fc28c;box-shadow:0 4px 0 #2c7a50} .die.m-lucky .badge{color:var(--ok)}
 .die.m-eye .body{background:radial-gradient(circle at 50% 40%,#5a1430,#24060f);box-shadow:0 4px 0 #12030a,0 0 12px rgba(229,72,77,.35)} .die.m-eye .face i.on{background:#ff4d5a;box-shadow:0 0 6px #ff2f45} .die.m-eye .badge{color:#ff4d5a}
 .die.m-yin .body{background:radial-gradient(circle at 40% 35%,#36406a,#141a33);box-shadow:0 4px 0 #0b0e1c} .die.m-yin .face i.on{background:#f1ece2} .die.m-yin .badge{color:#aab4e8}
 .die.m-yang .body{background:radial-gradient(circle at 40% 35%,#ffffff,#fff1c9);box-shadow:0 4px 0 #c9a960,0 0 12px rgba(255,214,120,.5)} .die.m-yang .face i.on{background:#a8741a} .die.m-yang .badge{color:#ffd77a}
@@ -1281,7 +1279,7 @@ const DITEMS = {
   yin:   {g:'陰', name:'陰のインク', price:4, mod:true, ink:'#1f2540', desc:'陰のダイスの偶数が得点するとチップ+20。陰陽の覚醒に使う'},
   yang:  {g:'陽', name:'陽のインク', price:4, mod:true, ink:'#fff6dc', desc:'陽のダイスの奇数が得点するとチップ+20。陰陽の覚醒に使う'},
   red1:  {g:'赤', name:'赤一のインク', price:4, mod:true, ink:'#f3ece0', desc:'1の目が大きな赤い1になる(1の面がなければ、いちばん小さい面を1に変える)。赤い1が得点するとチップ+30'},
-  lucky: {g:'運', name:'幸運のインク', price:5, mod:true, ink:'#5fc28c', desc:'染めたダイスは止まったとき3回に1回「当たり」になる。当たったダイスが得点すると倍率+20'},
+  lucky: {g:'運', name:'幸運のインク', price:5, mod:true, ink:'#5fc28c', desc:'染めたダイスが得点すると3回に1回、倍率+20'},
   up:    {g:'+1', name:'目の底上げ', price:6, desc:'ダイスの全部の面を+1する(最大9)'},
   tag1:  {g:'1', name:'タグ:1', price:3, tagN:1, desc:'ダイスの面を1つ1に描き換える(1以外でいちばん大きい面)。1が出やすくなる'},
   tag2:  {g:'2', name:'タグ:2', price:3, tagN:2, desc:'ダイスの面を1つ2に描き換える(2からいちばん遠い面)。2が出やすくなる'},
@@ -1860,8 +1858,7 @@ function computeScore(){
     if (d.mod === 'fire')  push({kind:'die', i, sp:1, mult:hasRelic('bellows') ? 8 : 4});
     if (d.mod === 'steel') push({kind:'die', i, sp:1, chips:50});
     if (d.mod === 'gold')  push({kind:'die', i, sp:1, money:2 + S.relics.filter(r => r.id === 'maneki').length});
-    if (d.mod === 'lucky' && d.luck === undefined) d.luck = Math.random() < 1/3;   // inked after the roll: decide once, then keep it
-    if (d.mod === 'lucky' && d.luck) push({kind:'die', i, sp:1, mult:20, text:'ラッキー +20', cls:'mult'});
+    if (d.mod === 'lucky' && Math.random() < 1/3) push({kind:'die', i, sp:1, mult:20, text:'ラッキー +20', cls:'mult'});
     if (d.mod === 'eye' && v === 6) push({kind:'die', i, sp:1, chips:66});
     if (d.mod === 'yin' && v % 2 === 0) push({kind:'die', i, sp:1, chips:20});
     if (d.mod === 'yang' && v % 2 === 1) push({kind:'die', i, sp:1, chips:20});
@@ -1894,7 +1891,7 @@ function faceHTML(v, mod){
 }
 function dieHTML(d, i){
   const badge = '';
-  return `<button class="die ${d.mod ? 'm-'+d.mod : ''} ${d.held ? 'held' : ''} ${d.mod === 'lucky' && d.luck && d.value != null ? 'lucky-hit' : ''}" data-i="${i}" aria-label="ダイス${i+1}"><div class="body">${faceHTML(d.value == null ? Math.min(...d.faces) : d.value, d.mod)}</div>${badge}</button>`;
+  return `<button class="die ${d.mod ? 'm-'+d.mod : ''} ${d.held ? 'held' : ''}" data-i="${i}" aria-label="ダイス${i+1}"><div class="body">${faceHTML(d.value == null ? Math.min(...d.faces) : d.value, d.mod)}</div>${badge}</button>`;
 }
 function renderDice(){ $('#tray').innerHTML = S.dice.map(dieHTML).join(''); }
 const dieEl = i => $('#tray').children[i];
@@ -2093,7 +2090,6 @@ function landFX(el, d, r){
     case 'fire': glowDie(el, '#ff7a2a', 500); noise(.12, .1, 2500); burst(r.x, r.y - r.h*.3, 10, ['#ffb02e','#ff3b2a','#fff1a8'], 2.5); break;
     case 'gold': glowDie(el, '#ffd34d', 500); SFX.coin(); burst(r.x, r.y, 10, ['#ffd34d','#fff1a8'], 3); break;
     case 'glass': glowDie(el, '#bfe4ff', 500); tone(2600, .25, 'sine', .04); tone(3900, .2, 'sine', .02); burst(r.x, r.y, 8, ['#e8f6ff','#a8dcff'], 2.5); break;
-    case 'lucky': if (d.luck){ glowDie(el, '#5fe09a', 1100); tone(1318, .2, 'triangle', .05); setTimeout(() => tone(1760, .2, 'triangle', .05), 90); setTimeout(() => tone(2637, .3, 'triangle', .04), 180); burst(r.x, r.y, 18, ['#5fe09a','#d8ffe6','#fff1a8'], 3.5); pop(el, '当たり!', 'mult'); } break;
   }
 }
 async function rollDice(idx, ivs){
@@ -2102,10 +2098,9 @@ async function rollDice(idx, ivs){
   const prev = S.dice.filter((d, i) => !idx.includes(i) && d.value != null).map(d => ({mod:d.mod, value:d.value}));
   for (let k=0;k<idx.length;k++){
     const i = idx[k], d = S.dice[i], el = dieEl(i);
-    clearInterval(ivs[k]); d.value = rollFace(d, prev); d.luck = d.mod === 'lucky' ? Math.random() < 1/3 : undefined; prev.push({mod:d.mod, value:d.value}); setFace(el, d.value);
+    clearInterval(ivs[k]); d.value = rollFace(d, prev); prev.push({mod:d.mod, value:d.value}); setFace(el, d.value);
     el.classList.remove('rolling'); retrigger(el, 'land'); setTimeout(() => el.classList.remove('land'), 320); SFX.land(); shake(4, 150);
     const r = rel(el); burst(r.x, r.y + r.h*.45, 8, ['#efeae0','#8d9098'], 3);
-    el.classList.toggle('lucky-hit', d.mod === 'lucky' && !!d.luck);
     landFX(el, d, r);
     if (k < idx.length - 1) await sleep(reduced ? 60 : 260);
   }
