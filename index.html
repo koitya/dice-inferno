@@ -395,17 +395,28 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #ovShop .sheet.shop2{display:flex;flex-direction:column;gap:7px;max-height:100%;overflow-y:auto}
 .shop2 > *{flex-shrink:0}
 .shop2 .shoptop{gap:4px;padding-bottom:6px}
-.shop2 .shoptop .npc{grid-template-columns:50px 1fr}
-.shop2 .shoptop .portrait{width:50px}
-.shop2 .shoptop .bubble{margin-top:2px;min-height:36px;font-size:13px;padding:5px 10px 6px}
+.shop2 .shoptop .npc{grid-template-columns:76px 1fr}
+.shop2 .shoptop .portrait{width:76px}
+.shop2 .shoptop .bubble{margin-top:10px;min-height:44px;font-size:14px;padding:6px 11px 7px}
 .shop2 .shop-head h2{font-size:18px;margin:0}
 .shop2 .shop-head .money{font-size:19px}
 .shop2 .shoptop{padding-top:10px!important}
 .shelf{display:grid;gap:6px}
 .shelf-r{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.shelf-s{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.shelf-s{display:grid;grid-template-columns:3fr auto 2fr;gap:7px;align-items:end}
+.sgrp{display:grid;gap:3px;min-width:0}
+.sg-ink{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.sg-boost{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+.sdiv{width:0;align-self:stretch;border-left:2px dashed var(--muted);opacity:.6;margin:16px 1px 4px}
+.shelf-lbl{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--muted)}
+.repbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 6px;padding:6px 8px 6px 10px;border-radius:10px;background:var(--mult);color:#fff;font-weight:800;font-size:13px}
+.repbar .btn{padding:4px 12px}
+#ovSPop{background:rgba(10,8,16,.55);backdrop-filter:none;z-index:30}
+.spop{width:min(86vw,340px);background:var(--bg2);border:3px solid var(--o);border-radius:16px;box-shadow:6px 6px 0 var(--o);padding:14px;display:grid;gap:10px;animation:spIn .18s ease-out}
+@keyframes spIn{from{transform:scale(.9);opacity:0}}
+.spop .sd-desc{font-size:14px}
 .scard{position:relative;display:grid;justify-items:center;align-content:start;gap:2px;padding:7px 3px 6px;border-radius:10px;border:2px solid var(--o);background:var(--surface);color:var(--text);box-shadow:2px 2px 0 var(--o);font:inherit;cursor:pointer;min-width:0}
-.scard .g{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:19px;background:var(--surface2);border:2px solid var(--o)}
+.scard .g{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:19px;background:var(--surface2);border:2px solid var(--o)}
 .shelf-s .scard .g{width:30px;height:30px;font-size:16px}
 .scard .nm{font-size:10px;font-weight:700;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .scard .pr{font-size:12px;font-weight:900;color:var(--gold)}
@@ -939,9 +950,9 @@ b.km{color:var(--mult);font-weight:900}
         <div class="shop-head"><h2>ショップ</h2><div class="money" id="shopMoney">$0</div></div>
       </div>
       <div class="shelf" id="shopItems"></div>
-      <div class="sdetail" id="shopDetail"></div>
       <div class="owned2">
         <div class="lbl">持ち物 <small>タップで説明・売る/長押しで並べ替え</small></div>
+        <div class="repbar" id="repBar" hidden><span id="repTxt"></span><button class="btn ghost small" id="repCancel">やめる</button></div>
         <div class="owned" id="shopOwned"></div>
         <div class="ownedInk" id="shopInks"></div>
       </div>
@@ -949,6 +960,14 @@ b.km{color:var(--mult);font-weight:900}
         <button class="btn ghost small" id="btnReroll">入れ替え $2</button>
         <button class="btn play small" id="btnNext">次のラウンドへ</button>
       </div>
+    </div>
+  </div>
+
+  <div class="overlay center" id="ovSPop" hidden>
+    <div class="spop">
+      <div class="sd-head"><span class="g" id="spG"></span><div><b id="spName"></b><small id="spTag"></small></div></div>
+      <p class="sd-desc" id="spDesc"></p>
+      <div class="row2"><button class="btn ghost small" id="spNo">やめる</button><button class="btn light small" id="spBuy">買う</button></div>
     </div>
   </div>
 
@@ -2899,7 +2918,7 @@ function openShop(regen=true){
   BGM.setMode('shop');
   $('#ovClear').hidden = true; S.phase = 'shop';
   if (regen || !S.shop) S.shop = {items:genShop(), rerollCost:2};
-  shopSel = null;
+  shopSel = null; closeShopPop();
   renderShop(); $('#ovShop').hidden = false; $('#btnNext').disabled = false;
   { const sh = $('#ovShop .sheet'); if (sh) sh.scrollTop = 0; $('#ovShop').scrollTop = 0; }
   const r = S.lastClear || {};
@@ -2924,21 +2943,11 @@ function renderShop(){
   const items = S.shop.items.map((it, k) => [it, k]);
   const card = ([it, k]) => { const f = itemInfo(it);
     return `<button class="scard ${f.cls} ${it.sold ? 'sold' : ''} ${shopSel && shopSel.k === k ? 'sel' : ''}" data-k="${k}"><span class="g">${f.g}</span><span class="nm">${f.name}</span><span class="pr">${it.sold ? '済' : '$' + it.price}</span></button>`; };
-  $('#shopItems').innerHTML = `<div class="shelf-r">${items.filter(([it]) => it.type === 'relic').map(card).join('')}</div>`
-    + `<div class="shelf-s">${items.filter(([it]) => it.type !== 'relic').map(card).join('')}</div>`;
-  const det = $('#shopDetail');
-  if (!shopSel || !S.shop.items[shopSel.k]) det.innerHTML = '<p class="muted sd-empty">商品をタップすると、ここに説明が出るよ</p>';
-  else {
-    const it = S.shop.items[shopSel.k], f = itemInfo(it);
-    if (shopSel.replace){
-      det.innerHTML = `<p class="sd-rep">持ち物から、手放す${shopSel.replace === 'relic' ? 'レリック' : 'インク'}をタップしてね。<br><small>売ったお金はそのまま使えるよ</small></p><button class="btn ghost small" id="sdCancel">やめる</button>`;
-    } else {
-      const full = (it.type === 'relic' && S.relics.length >= 5) || (it.type === 'dice' && S.items.length >= 3);
-      det.innerHTML = `<div class="sd-head"><span class="g ${f.cls}">${f.g}</span><div><b>${f.name}</b><small>${f.tag}${f.tags ? ' ' + f.tags : ''}</small></div></div>
-        <p class="sd-desc">${colorDesc(f.desc)}</p>
-        <button class="btn light small" id="sdBuy" ${it.sold ? 'disabled' : ''}>${it.sold ? '買った' : (full ? '入れ替えて買う' : '買う') + ' $' + it.price}</button>`;
-    }
-  }
+  const grp = t => items.filter(([it]) => it.type === t).map(card).join('');
+  $('#shopItems').innerHTML = `<div class="shelf-lbl">レリック</div><div class="shelf-r">${grp('relic')}</div>`
+    + `<div class="shelf-s"><div class="sgrp"><div class="shelf-lbl">インク</div><div class="sg-ink">${grp('dice')}</div></div><div class="sdiv"></div><div class="sgrp"><div class="shelf-lbl">役アップ</div><div class="sg-boost">${grp('boost')}</div></div></div>`;
+  const rp = shopSel && shopSel.replace;
+  $('#repBar').hidden = !rp; if (rp) $('#repTxt').textContent = `手放す${rp === 'relic' ? 'レリック' : 'インク'}をタップしてね`;
   let h = S.relics.map(relicHTML).join(''); for (let k = S.relics.length; k < 5; k++) h += '<div class="slot">空き</div>';
   $('#shopOwned').innerHTML = h;
   let ink = ''; for (let k = 0; k < 3; k++){ const id = S.items[k];
@@ -2949,9 +2958,19 @@ function renderShop(){
   $('#btnReroll').textContent = `入れ替え $${S.shop.rerollCost}`;
   if (S.phase === 'shop') saveRun('shop');
 }
+function openShopPop(k){
+  const it = S.shop.items[k]; if (!it) return; const f = itemInfo(it);
+  const full = (it.type === 'relic' && S.relics.length >= 5) || (it.type === 'dice' && S.items.length >= 3);
+  $('#spG').textContent = f.g; $('#spG').className = 'g ' + f.cls; $('#spName').textContent = f.name;
+  $('#spTag').innerHTML = f.tag + (f.tags ? ' ' + f.tags : ''); $('#spDesc').innerHTML = colorDesc(f.desc);
+  const b = $('#spBuy'); b.disabled = !!it.sold; b.textContent = it.sold ? '買った' : `${full ? '入れ替えて買う' : '買う'} $${it.price}`;
+  $('#ovSPop').hidden = false;
+}
+function closeShopPop(){ $('#ovSPop').hidden = true; }
 function shopBuy(k){
   const it = S.shop.items[k]; if (!it || it.sold) return;
   if (S.money < it.price){ SFX.bad(); say('shop', pick('poor', LINES.poor), 'smug'); return; }
+  closeShopPop();
   if (it.type === 'relic' && S.relics.length >= 5){ shopSel = {k, replace:'relic'}; SFX.click(); say('shop', 'どれと入れ替える?', 'normal'); renderShop(); return; }
   if (it.type === 'dice' && S.items.length >= 3){ shopSel = {k, replace:'dice'}; SFX.click(); say('shop', 'どのインクと入れ替える?', 'normal'); renderShop(); return; }
   pendingBuy = k; shopSel = null; doBuy();
@@ -3263,13 +3282,13 @@ $('#cfNo').onclick = cancelBuy;
 $('#ovConfirm').addEventListener('click', e => { if (e.target.id === 'ovConfirm') cancelBuy(); });
 $('#shopItems').addEventListener('click', e => {
   const c = e.target.closest('.scard'); if (!c) return; const k = +c.dataset.k, it = S.shop.items[k];
-  shopSel = {k}; SFX.click(); renderShop();
+  shopSel = {k}; SFX.click(); renderShop(); openShopPop(k);
   if (!it.sold) say('shop', pick('ask', LINES.ask).replace('$', '$' + it.price), 'normal');
 });
-$('#shopDetail').addEventListener('click', e => {
-  if (e.target.closest('#sdBuy') && shopSel) shopBuy(shopSel.k);
-  else if (e.target.closest('#sdCancel') && shopSel){ shopSel = {k:shopSel.k}; SFX.click(); renderShop(); }
-});
+$('#spBuy').onclick = () => { if (shopSel) shopBuy(shopSel.k); };
+$('#spNo').onclick = () => { closeShopPop(); shopSel = null; SFX.click(); renderShop(); };
+$('#ovSPop').addEventListener('click', e => { if (e.target.id === 'ovSPop'){ closeShopPop(); shopSel = null; renderShop(); } });
+$('#repCancel').onclick = () => { shopSel = null; SFX.click(); renderShop(); };
 $('#shopInks').addEventListener('click', e => {
   const el = e.target.closest('.itemslot.full'); if (!el) return; const k = +el.dataset.k;
   if (shopSel && shopSel.replace === 'dice') replaceOwned('dice', k); else itemSlotInfo(k);
