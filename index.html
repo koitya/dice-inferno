@@ -2652,7 +2652,7 @@ async function charge(el, st, k){
 
 /* ---------- ゾロ目: the last 3 digits of a hand all match ---------- */
 function zoromeDigit(t){ if (!(t >= 100 && t < 1e15)) return 0; return Math.floor(t) % 1000 === 777 ? 7 : 0; }   // only 777 counts (rare jackpot)
-const ZLINES = {7:['777!? うそでしょ、大当たりじゃん!!', 'ちょっと、777って…あんた何者?', 'セブンが3つ…今日のあんた、神がかってる'],
+const ZLINES = {7:['……777。初めて見た', '……うそ。777?'],
   6:['666…悪魔のゾロ目だね。ふふ、似合ってる'], other:['ゾロ目!? ちょ、それ刻んどきな', 'へぇ、数字がそろった。ツイてるじゃん', 'ゾロ目なんて久しぶりに見たよ']};
 async function zoromeShow(dg){
   const ov = $('#ovZoro'), reels = [...ov.querySelectorAll('.zreels span')], st = $('#zStamp'), card = $('#zCard');
