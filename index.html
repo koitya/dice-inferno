@@ -138,6 +138,18 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #cut .flame.blaze .fl{animation:blaze .5s cubic-bezier(.2,1.4,.4,1) forwards,flick .15s ease-in-out .5s infinite alternate}
 @keyframes blaze{to{transform:scale(1.5,1.35)}}
  #cut .firecv{position:absolute;inset:0;width:100%;height:100%}
+#cut .fxmul{position:absolute;z-index:2;transform:translate(-50%,-50%) scale(.4);opacity:0;font-family:var(--num,inherit);font-weight:900;font-size:clamp(34px,11vw,52px);line-height:1;color:#fff1a8;white-space:nowrap;-webkit-text-stroke:2px #6b1200;paint-order:stroke fill;text-shadow:0 0 18px #ff7a2a,0 3px 0 #7a1a00;transition:opacity .1s,transform .2s cubic-bezier(.2,1.6,.4,1)}
+#cut .fxmul.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#cut .fxmul.big{transform:translate(-50%,-50%) scale(1.3)}
+#cut .fxmul.hit{animation:fxHit .24s cubic-bezier(.2,1.8,.4,1)}
+@keyframes fxHit{from{transform:translate(-50%,-50%) scale(1.8)}}
+#cut .fireword{position:absolute;left:50%;top:38%;translate:-50% -50%;z-index:2;color:#fff3c4;white-space:nowrap;-webkit-text-stroke:3px #6b1200;paint-order:stroke fill;text-shadow:0 0 22px #ff5a00,0 5px 0 #3a0800}
+#cut .fireword.in{animation:fwShake .5s linear}
+@keyframes fwShake{0%,100%{rotate:0deg}20%{rotate:-4deg}40%{rotate:3deg}60%{rotate:-2deg}80%{rotate:1deg}}
+#cut .fxmul.out,#cut .fireword.out{opacity:0;transition:opacity .3s}
+.die.ignite::before{opacity:1;animation:none;box-shadow:0 0 0 3px #ff7a2a,0 0 26px 4px #ff5a00}
+.die.ignite .body{animation:igniteJig .32s cubic-bezier(.2,1.6,.4,1)}
+@keyframes igniteJig{0%{transform:scale(1.3) rotate(-8deg);filter:brightness(1.8)}100%{transform:none;filter:none}}
 #cut .aw .wave{opacity:0;transform-box:fill-box;transform-origin:center}
 #cut .yy.mixed .wave,#cut .qt.drop .wave{animation:wave .9s ease-out forwards}
 @keyframes wave{0%{opacity:1;transform:scale(.6)}100%{opacity:0;transform:scale(2.6)}}
@@ -1966,7 +1978,7 @@ function computeScore(){
   if (ctx.eyes >= 3 && !hasRelic('secret')) steps.push({kind:'die', i:ev.idx.find(i => S.dice[i].mod === 'eye'), text:'秘密結社がいれば開眼…', cls:'null', chipsAfter:chips, multAfter:mult});
   S.relics.forEach((r, ri) => { const def = RELICS[r.id]; if (def.onHand){ const e = def.onHand(ctx, r); if (!e) return;
     if (e.grew) push({kind:'relic', r:ri, text:'育った', cls:'info', grow:1});
-    if (e.awaken) steps.push({kind:'awaken', type:e.awaken, chipsAfter:chips, multAfter:mult});
+    if (e.awaken) steps.push({kind:'awaken', type:e.awaken, idx:e.awaken === 'fire' ? ev.idx.filter(i => S.dice[i].mod === 'fire') : null, chipsAfter:chips, multAfter:mult});
     if (e.shatter) ev.idx.forEach(i => { if (S.dice[i].mod === 'glass') breaks.add(i); });
     push({kind:'relic', r:ri, sp:!e.cls, ...e}); } });
   return {ev, base:b, steps, chips, mult, total:Math.floor(chips*mult), breaks:[...breaks]};
@@ -2185,7 +2197,7 @@ async function alignKept(){
 }
 async function startShake(){
   if (S.rollsUsed > 0){ S.phase = 'aligning'; setButtons(); await alignKept(); S.phase = 'play'; }
-  shaking = true; spinIdx = rollTargets();
+  shaking = true; spinIdx = rollTargets(); renderSelection();
   spinIvs = spinIdx.map(i => { const el = dieEl(i), d = S.dice[i]; el.classList.remove('land','jig','charging','shaking'); el.classList.add('rolling'); return setInterval(() => setFace(el, rnd(d.faces)), 45); });
   rattleIv = setInterval(() => { noise(.025, .2, 3400); tone(900 + Math.random()*300, .015, 'square', .03); }, 55);
   setButtons(); renderHint(null);
@@ -2445,6 +2457,67 @@ async function screenFire(dur){
   cv2.remove();
 }
 
+/* ---- 業火: fire dice ignite one by one, then erupt ---- */
+let FIRESPR = null;
+function fireSprite(){
+  if (FIRESPR) return FIRESPR;
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,245,190,1)'); gr.addColorStop(.35, 'rgba(255,150,40,.8)'); gr.addColorStop(.7, 'rgba(220,50,0,.3)'); gr.addColorStop(1, 'rgba(160,20,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return FIRESPR = c;
+}
+async function infernoCut(st){
+  const c = $('#cut');
+  let els = (st && st.idx && st.idx.length ? st.idx : [0, 1, 2]).map(i => dieEl(i)).filter(Boolean);
+  const cv = document.createElement('canvas'); cv.className = 'firecv'; c.append(cv);
+  const mul = document.createElement('div'); mul.className = 'fxmul'; c.append(mul);
+  const word = document.createElement('div'); word.className = 'aword fireword'; word.textContent = '業火'; c.append(word);
+  const W = cv.width = c.clientWidth, H = cv.height = c.clientHeight, g = cv.getContext('2d'), spr = fireSprite();
+  const pos = els.map(el => rel(el)), em = [], ps = [];
+  const cx = pos.length ? pos.reduce((a, p) => a + p.x, 0)/pos.length : W/2, top = pos.length ? Math.min(...pos.map(p => p.t)) : H*.6;
+  mul.style.left = Math.max(70, Math.min(W - 70, cx)) + 'px'; mul.style.top = Math.max(50, top - 64) + 'px';
+  let dark = 0, darkT = .45, heat = 0, heatT = 0, live = true;
+  const loop = () => {
+    dark += (darkT - dark)*.18; heat += (heatT - heat)*.2;
+    g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H);
+    if (dark > .01){ g.fillStyle = `rgba(14,2,0,${dark})`; g.fillRect(0, 0, W, H); }
+    if (heat > .01){ const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, `rgba(255,120,20,${.6*heat})`); gr.addColorStop(.6, `rgba(200,40,0,${.35*heat})`); gr.addColorStop(1, `rgba(90,8,0,${.2*heat})`); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+    if (ps.length < (reduced ? 60 : 420)) em.forEach(e => { for (let k=0;k<e.rate;k++) ps.push({x:e.x + (Math.random() - .5)*e.w, y:e.y + Math.random()*e.w*.25, vx:(Math.random() - .5)*e.sp*.35, vy:-(1.5 + Math.random()*e.sp), r:e.s*(.5 + Math.random()*.6), l:0, m:20 + Math.random()*22, ph:Math.random()*6}); });
+    g.globalCompositeOperation = 'lighter';
+    for (let i = ps.length - 1; i >= 0; i--){ const q = ps[i]; q.l++; const k = q.l/q.m; if (k >= 1){ ps.splice(i, 1); continue; }
+      q.x += q.vx + Math.sin(q.l*.3 + q.ph)*.7; q.y += q.vy; q.vy *= 1.025;
+      const rr = q.r*(1 - k*.65); g.globalAlpha = 1 - k; g.drawImage(spr, q.x - rr, q.y - rr, rr*2, rr*2); }
+    g.globalAlpha = 1;
+    if (live) requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+  // 1) ignite each fire die
+  const gap = reduced ? 50 : els.length > 4 ? 150 : 200;
+  for (let k=0;k<els.length;k++){
+    const el = els[k], p = pos[k], m = Math.round(Math.pow(1.5, k + 1)*100)/100;
+    el.classList.add('ignite');
+    em.push({x:p.x, y:p.y + p.h*.25, w:p.w*.7, s:p.w*.45, rate:2, sp:3});
+    mul.textContent = '×' + m; mul.classList.add('on'); retrigger(mul, 'hit');
+    vNoise(0, .28, .5, 'lowpass', 1400, 180); vOsc('sine', 110, 38, 0, .32, .4, .004);
+    vOsc('triangle', 330*Math.pow(2, k*4/12), null, 0, .22, .07, .004);
+    shake(4 + k*3, 170);
+    await sleep(gap);
+  }
+  await sleep(reduced ? 40 : 140);
+  // 2) erupt
+  em.forEach(e => { e.rate = 5; e.sp = 9; e.s *= 2.2; e.w *= 1.6; });
+  em.push({x:W/2, y:H + 10, w:W*1.1, s:W*.13, rate:reduced ? 2 : 5, sp:11});
+  heatT = 1; darkT = .2;
+  impact(1.6); vNoise(0, 1.0, .6, 'bandpass', 600, 150, 1); flash(); shake(24, 650);
+  word.classList.add('in'); mul.classList.add('big');
+  await sleep(reduced ? 150 : 560);
+  // 3) die down
+  em.length = 0; heatT = 0; darkT = 0; word.classList.add('out'); mul.classList.add('out');
+  els.forEach(el => el.classList.remove('ignite'));
+  await sleep(reduced ? 80 : 360);
+  live = false; cv.remove(); mul.remove(); word.remove();
+}
+
 const AWAKEN = {
   yinyang:{bg:'radial-gradient(circle at 50% 45%, #3a3a3a, #050505 72%)',
     svg:`<svg class="aw yy" viewBox="0 0 200 200">
@@ -2505,13 +2578,7 @@ const AWAKEN = {
     run: async svg => { chargeUp(1.3, 1.8); sparkle(1.3, 26, 2093, .045); await sleep(reduced ? 100 : 1300);
       svg.classList.add('shatter'); impact(.9); for (let i=0;i<6;i++){ vNoise(i*.04, .35, .35, 'highpass', 5000 + i*400); vOsc('sine', 2600 + Math.random()*3000, null, i*.04, .5, .05, .002); } flash(); shake(16, 500);
       await sleep(reduced ? 100 : 1200); }},
-  fire:{bg:'transparent', svg:'',
-    run: async () => { const d = reduced ? 400 : 2800;
-      vNoise(0, d/1000, .5, 'lowpass', 200, 1800); chargeUp(d/1000*.75, .9);
-      for (let i=0;i<24;i++) setTimeout(() => vNoise(0, .03, .25, 'highpass', 2500 + Math.random()*3000), Math.random()*d);
-      const shk = setInterval(() => shake(8, 200), 220);
-      setTimeout(() => { impact(1.8); vNoise(0, 1.2, .6, 'bandpass', 600, 150, 1); flash(); shake(24, 700); }, d*.75);
-      await screenFire(d); clearInterval(shk); }},
+  fire:{bg:'transparent', svg:'', run: async (svg, st) => { await infernoCut(st); }},
 };
 function yinYangMix(d){
   if (!AC || muted) return;
@@ -2529,7 +2596,7 @@ function yinYangMix(d){
   const ng = AC.createGain(); ng.gain.value = .12; n.connect(bp).connect(ng).connect(AC.destination); n.start(t);
 }
 function taiko(){ tone(60, .5, 'sine', .5, 35); noise(.2, .3, 400); setTimeout(() => { tone(60, .4, 'sine', .45, 35); noise(.15, .25, 400); }, 220); }
-async function awaken(type){
+async function awaken(type, st){
   const A = AWAKEN[type]; if (!A) return;
   BGM.duck(true);
   const c = $('#cut');
@@ -2538,7 +2605,7 @@ async function awaken(type){
   c.hidden = false;
   const svg = c.querySelector('svg');
   await sleep(60); if (svg) svg.classList.add('in');
-  await A.run(svg);
+  await A.run(svg, st);
   c.hidden = true; c.innerHTML = ''; c.style.background = ''; BGM.duck(false);
   await sleep(150);
 }
@@ -2655,7 +2722,7 @@ async function play(){
   const multBass = (big) => { const st = PENT[Math.min(PENT.length - 1, mk)]; mk++; return smp('bass', {vol:big ? 1.1 : .85, rate:(61.74/50.0)*Math.pow(2, st/12), dur:big ? 1.1 : .55}); };
   for (const st of R.steps){
     if (st.kind === 'cut'){ await cut666(st.eye); continue; }
-    if (st.kind === 'awaken'){ await awaken(st.type); continue; }
+    if (st.kind === 'awaken'){ await awaken(st.type, st); continue; }
     const el = st.kind === 'die' ? dieEl(st.i) : relicEl(st.r);
     if (st.sp) await charge(el, st, k);
     if (st.grow){ renderRelics(); }
